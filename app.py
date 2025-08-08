@@ -1,73 +1,70 @@
 import streamlit as st
-from fpdf import FPDF
-from PIL import Image
-import tempfile
 import base64
 
 st.set_page_config(page_title="Cleaning Walkthrough", layout="centered")
 
-walkthrough_type = st.sidebar.selectbox(
+walkthrough_type = st.sidebar.radio(
+
     "Walkthrough Type",
     ["Residential", "Commercial", "Move In/Out", "Custom"],
 )
 
 st.title(f"{walkthrough_type} Cleaning Walkthrough")
+estimate_date = st.date_input("Date Estimate Sent")
+estimate_numbers = st.text_input("Estimate #'s & Time")
+completed_by = st.text_input("Completed By")
+client_name = st.text_input("Client Name(s)")
+billed_to = st.text_input("Billed to")
+phone = st.text_input("Phone")
+email = st.text_input("Email")
+location = st.text_input("Location")
+start_date = st.date_input("Preferred Start Date")
 
-with st.form("walkthrough_form"):
-    estimate_date = st.date_input("Date Estimate Sent")
-    estimate_numbers = st.text_input("Estimate #'s & Time")
-    completed_by = st.text_input("Completed By")
-    client_name = st.text_input("Client Name(s)")
-    billed_to = st.text_input("Billed to")
-    phone = st.text_input("Phone")
-    email = st.text_input("Email")
-    location = st.text_input("Location")
-    start_date = st.date_input("Preferred Start Date")
+frequency_options = ["One-time", "Weekly", "Biweekly", "Every 4 Weeks"]
+frequency = st.multiselect("Frequency", frequency_options)
+frequency_other = st.text_input("Other Frequency")
 
-    frequency_options = ["One-time", "Weekly", "Biweekly", "Every 4 Weeks"]
-    frequency = st.multiselect("Frequency", frequency_options)
-    frequency_other = st.text_input("Other Frequency")
+referral_source = st.text_input("Referral Source")
 
-    referral_source = st.text_input("Referral Source")
+service_options = [
+    "Little Bit Clean",
+    "Classic",
+    "Diamond",
+    "Heavy Focus",
+    "Custom",
+    "Move In/Out",
+    "Commercial",
+    "Pet Add-on",
+    "Family Add-on",
+]
+service_type = st.multiselect("Service Type Requested", service_options)
 
-    service_options = [
-        "Little Bit Clean",
-        "Classic",
-        "Diamond",
-        "Heavy Focus",
-        "Custom",
-        "Move In/Out",
-        "Commercial",
-        "Pet Add-on",
-        "Family Add-on",
-    ]
-    service_type = st.multiselect("Service Type Requested", service_options)
+floors_options = ["Windows", "Carpets"]
+floors = st.multiselect("Floors", floors_options)
+floors_other = st.text_input("Other Floors")
 
-    floors_options = ["Windows", "Carpets"]
-    floors = st.multiselect("Floors", floors_options)
-    floors_other = st.text_input("Other Floors")
+cleaning_level = st.slider("Level of Cleaning (1–10)", 1, 10, 5)
+entry_instructions = st.text_area("Entry/Arrival Instructions")
+supply_notes = st.text_area("Supply or Equipment Notes")
+safety_instructions = st.text_area(
+    "Safety Instructions", placeholder="Cats: Inside/Outside. Dogs: Inside/Outside. Names, other..."
+)
+special_requests = st.text_area("Special Requests/Instructions")
+areas_excluded = st.text_area("Areas Not to Be Done")
 
-    cleaning_level = st.slider("Level of Cleaning (1–10)", 1, 10, 5)
-    entry_instructions = st.text_area("Entry/Arrival Instructions")
-    supply_notes = st.text_area("Supply or Equipment Notes")
-    safety_instructions = st.text_area(
-        "Safety Instructions", placeholder="Cats: Inside/Outside. Dogs: Inside/Outside. Names, other..."
-    )
-    special_requests = st.text_area("Special Requests/Instructions")
-    areas_excluded = st.text_area("Areas Not to Be Done")
+closed_doors = st.radio(
+    "Closed Doors?", ["Yes", "No", "Only if on task list"], horizontal=True
+)
+photo_consent = st.radio("Photo Consent?", ["Yes", "No"], horizontal=True)
 
-    closed_doors = st.radio(
-        "Closed Doors?", ["Yes", "No", "Only if on task list"], horizontal=True
-    )
-    photo_consent = st.radio("Photo Consent?", ["Yes", "No"], horizontal=True)
+walkthrough_photos = st.file_uploader(
+    "Take Photos or Upload Images",
+    type=["png", "jpg", "jpeg"],
+    accept_multiple_files=True,
+)
 
-    walkthrough_photos = st.file_uploader(
-        "Take Photos or Upload Images",
-        type=["png", "jpg", "jpeg"],
-        accept_multiple_files=True,
-    )
+submitted = st.button("Submit Walkthrough")
 
-    submitted = st.form_submit_button("Submit Walkthrough")
 
 if submitted:
     data = {
@@ -95,6 +92,7 @@ if submitted:
         "Photo Consent?": photo_consent,
     }
 
+
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
@@ -117,4 +115,4 @@ if submitted:
     pdf_bytes = pdf.output(dest="S").encode("latin1")
     b64 = base64.b64encode(pdf_bytes).decode()
     href = f'<a href="data:application/pdf;base64,{b64}" target="_blank">Open PDF</a>'
-    st.markdown(href, unsafe_allow_html=True)
+

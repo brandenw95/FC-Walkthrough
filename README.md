@@ -1,6 +1,8 @@
 # FC-Walkthrough
 
+
 Streamlit application for collecting walkthrough information and generating a PDF summary.
+
 
 ## Setup
 
