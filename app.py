@@ -2,7 +2,9 @@ import streamlit as st
 import base64
 from pathlib import Path
 from datetime import datetime
+
 from string import Template
+
 
 st.set_page_config(page_title="Cleaning Walkthrough", layout="centered")
 
@@ -156,6 +158,7 @@ if submitted:
       display: flex;
     }
 
+
     .lightbox img {
       max-width: 90vw;
       max-height: 90vh;
@@ -258,6 +261,7 @@ if submitted:
         photo_consent=photo_consent,
         images_html=images_html,
     )
+
 
     filename = f"walkthrough_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
     output_path = Path(__file__).parent / filename
