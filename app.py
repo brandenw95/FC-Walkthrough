@@ -1,5 +1,7 @@
 import streamlit as st
 import base64
+from pathlib import Path
+from datetime import datetime
 
 st.set_page_config(page_title="Cleaning Walkthrough", layout="centered")
 
@@ -119,7 +121,13 @@ if submitted:
             )
 
     html.extend(["</body>", "</html>"])
-    html_bytes = "\n".join(html).encode("utf-8")
-    b64 = base64.b64encode(html_bytes).decode()
-    href = f'<a href="data:text/html;base64,{b64}" target="_blank">Open Walkthrough</a>'
-    st.markdown(href, unsafe_allow_html=True)
+    html_content = "\n".join(html)
+
+    filename = f"walkthrough_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+    output_path = Path(__file__).parent / filename
+    output_path.write_text(html_content, encoding="utf-8")
+
+    st.markdown(
+        f'<a href="{output_path.name}" target="_blank">Open Walkthrough</a>',
+        unsafe_allow_html=True,
+    )
