@@ -4,7 +4,6 @@ import base64
 st.set_page_config(page_title="Cleaning Walkthrough", layout="centered")
 
 walkthrough_type = st.sidebar.radio(
-
     "Walkthrough Type",
     ["Residential", "Commercial", "Move In/Out", "Custom"],
 )
@@ -65,7 +64,6 @@ walkthrough_photos = st.file_uploader(
 
 submitted = st.button("Submit Walkthrough")
 
-
 if submitted:
     data = {
         "Walkthrough Type": walkthrough_type,
@@ -92,27 +90,36 @@ if submitted:
         "Photo Consent?": photo_consent,
     }
 
+    html = [
+        "<!DOCTYPE html>",
+        "<html lang='en'>",
+        "<head>",
+        "<meta charset='UTF-8'>",
+        f"<title>{walkthrough_type} Cleaning Walkthrough</title>",
+        "<style>",
+        "body {font-family: 'Segoe UI', sans-serif; background-color: #fff; padding: 1rem; color: #333;}",
+        "h1 {text-align: center; color: #337ab7;}",
+        "p {margin: 0.5rem 0;}",
+        "img.photo {width: 120px; height: 120px; object-fit: cover; margin: 5px;}",
+        "</style>",
+        "</head>",
+        "<body>",
+        f"<h1>{walkthrough_type} Cleaning Walkthrough</h1>",
+    ]
 
-    pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-    pdf.set_font("Arial", "B", 16)
-    pdf.cell(0, 10, f"{walkthrough_type} Cleaning Walkthrough", ln=True, align="C")
-    pdf.ln(4)
-    pdf.set_font("Arial", size=12)
     for key, value in data.items():
-        pdf.multi_cell(0, 8, f"{key}: {value}")
-        pdf.ln(1)
+        html.append(f"<p><strong>{key}:</strong> {value}</p>")
 
-    for img in walkthrough_photos or []:
-        image = Image.open(img)
-        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        image.save(tmp.name)
-        pdf.add_page()
-        pdf.image(tmp.name, w=180)
-        tmp.close()
+    if walkthrough_photos:
+        html.append("<h2>Photos</h2>")
+        for img in walkthrough_photos:
+            b64_img = base64.b64encode(img.getvalue()).decode()
+            html.append(
+                f"<img class='photo' src='data:{img.type};base64,{b64_img}' />"
+            )
 
-    pdf_bytes = pdf.output(dest="S").encode("latin1")
-    b64 = base64.b64encode(pdf_bytes).decode()
-    href = f'<a href="data:application/pdf;base64,{b64}" target="_blank">Open PDF</a>'
-
+    html.extend(["</body>", "</html>"])
+    html_bytes = "\n".join(html).encode("utf-8")
+    b64 = base64.b64encode(html_bytes).decode()
+    href = f'<a href="data:text/html;base64,{b64}" target="_blank">Open Walkthrough</a>'
+    st.markdown(href, unsafe_allow_html=True)
